@@ -25,6 +25,7 @@ namespace gdl {
         [[nodiscard]] unsigned int getId() const;
         void setUniform4f(const std::string& name, float v0, float v1, float v2, float v3) const;
         void setUniformMat4f(const std::string& name, const glm::mat4& matrix) const;
+        void setUniform3f(const std::string& name, float v0, float v1, float v2) const;
 
         static void compileShader(unsigned int shaderId, const std::string& shaderCode);
         static std::string readShaderCode(const std::string& path);

@@ -13,9 +13,9 @@
 
 #include "../time-manager/TimeManager.h"
 #include "../shader/Shader.h"
-#include "../block-world/BlockWorld.h"
 #include "../controllers/Controllers.h"
-#include "../camera/Camera.h"
+#include "../scene/Scene.h"
+#include "../block-world/BlockWorld.h"
 
 
 namespace gdl {

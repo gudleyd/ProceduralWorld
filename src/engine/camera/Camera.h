@@ -11,6 +11,7 @@
 #include <glm/ext.hpp>
 
 #include "../time-manager/TimeManager.h"
+#include "../shader/Shader.h"
 
 
 namespace gdl {
@@ -19,7 +20,9 @@ namespace gdl {
         Forward,
         Right,
         Backward,
-        Left
+        Left,
+        Up,
+        Down
     };
 
     class Camera {
@@ -38,12 +41,23 @@ namespace gdl {
         void setSensitivity(float);
         [[nodiscard]] float getSensitivity() const;
 
+        [[nodiscard]] float getFov() const;
+
+        void setShader(const Shader&);
+        Shader& getShader();
+
+        float getPitch();
+        float getYaw();
+
+        void setX(float);
         void setY(float);
+        void setZ(float);
 
         [[nodiscard]] const glm::mat4& getView() const;
         [[nodiscard]] const glm::vec3& getPos() const;
 
     private:
+        Shader shader;
         glm::mat4 view;
         glm::vec3 position, front, up, right, worldUp;
         float pitch;

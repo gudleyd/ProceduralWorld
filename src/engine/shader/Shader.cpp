@@ -2,6 +2,8 @@
 // Created by lebedev-ivan on 25.04.2020.
 //
 
+#include <vector>
+#include <iostream>
 #include "Shader.h"
 
 
@@ -51,6 +53,11 @@ namespace gdl {
         GLint result = GL_FALSE;
         glGetShaderiv(shaderId, GL_COMPILE_STATUS, &result);
         if (result != GL_TRUE) {
+            int strLength;
+            glGetShaderiv(shaderId, GL_INFO_LOG_LENGTH, &strLength);
+            std::vector<char> programErrorMessage(strLength+1);
+            glGetShaderInfoLog(shaderId, strLength, NULL, &programErrorMessage[0]);
+            std::cout << &programErrorMessage[0] << std::endl;
             throw std::runtime_error("Cannot compile shader with id " + std::to_string(shaderId));
         }
     }
@@ -67,6 +74,10 @@ namespace gdl {
             throw std::runtime_error("Cannot open shader on " + path);
         }
         return shaderCode;
+    }
+
+    void Shader::setUniform3f(const std::string& name, float v0, float v1, float v2) const {
+        glUniform3f(glGetUniformLocation(this->program, name.c_str()), v0, v1, v2);
     }
 
     void Shader::setUniform4f(const std::string& name, float v0, float v1, float v2, float v3) const {

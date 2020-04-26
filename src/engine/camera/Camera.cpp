@@ -7,11 +7,11 @@
 
 namespace gdl {
 
-    Camera::Camera() {
-        this->position = {0.0f, 0.0f, 0.0f};
-        this->pitch = 0.0f;
+    Camera::Camera(): shader(Shader("../resources/shaders/shader.vert", "../resources/shaders/shader.frag")) {
+        this->position = {-7.0f, 27.0f, -14.5f};
+        this->pitch = -23.8f;
         this->fov = 45.0f;
-        this->yaw = -90.0f;
+        this->yaw = 49.0f;
         this->speed = 50.0f;
         this->sensitivity = 0.1f;
         this->worldUp = {0.0f, 1.0f, 0.0f};
@@ -44,6 +44,8 @@ namespace gdl {
             case Backward: this->position -= this->front * velocity; break;
             case Right: this->position += this->right * velocity; break;
             case Left: this->position -= this->right * velocity; break;
+            case Up: this->position += this->up * velocity; break;
+            case Down: this->position -= this->up * velocity; break;
         }
     }
 
@@ -53,6 +55,10 @@ namespace gdl {
 
         this->yaw = glm::mod(this->yaw + x, 360.0f);
         this->pitch += y;
+
+        if (this->pitch > 89.9f) this->pitch = 89.9f;
+        if (this->pitch < -89.9f) this->pitch = -89.9f;
+
     }
 
     void Camera::setSpeed(float newSpeed) {
@@ -71,8 +77,36 @@ namespace gdl {
         return this->sensitivity;
     }
 
+    float Camera::getFov() const {
+        return this->fov;
+    }
+
+    void Camera::setShader(const Shader& sh) {
+        this->shader = sh;
+    }
+
+    float Camera::getPitch() {
+        return this->pitch;
+    }
+
+    float Camera::getYaw() {
+        return this->yaw;
+    }
+
+    Shader& Camera::getShader() {
+        return this->shader;
+    }
+
+    void Camera::setX(float x) {
+        this->position.x = x;
+    }
+
     void Camera::setY(float y) {
         this->position.y = y;
+    }
+
+    void Camera::setZ(float z) {
+        this->position.z = z;
     }
 
     const glm::mat4& Camera::getView() const {

@@ -2,30 +2,11 @@
 // Created by lebedev-ivan on 25.04.2020.
 //
 
+#include <iostream>
 #include "Controllers.h"
 
 
 namespace gdl {
-
-    void KeyboardController::addCallback(gdl::EventType eventType, gdl::KeyboardKey key,
-                                         std::function<void()> callbackHandler) {
-        this->callbacks.emplace_back(eventType, key, std::move(callbackHandler));
-    }
-
-    void KeyboardController::registerCallbacks() {
-        glfwSetKeyCallback(this->window, [](GLFWwindow *kWindow, int key, int, int action, int) {
-            auto &kCallbacks = std::get<0>(*static_cast<TCallbacks *>(glfwGetWindowUserPointer(kWindow)));
-            for (auto &f: kCallbacks) {
-                if ((int)std::get<0>(f) == action && (int)std::get<1>(f) == key)
-                        std::get<2>(f)();
-            }
-        });
-    }
-
-    const TKeyboardCallbacks &KeyboardController::getCallbacks() {
-        return this->callbacks;
-    }
-
 
     void MouseController::getCursorPos(double *x, double *y) {
         glfwGetCursorPos(this->window, x, y);
@@ -43,6 +24,20 @@ namespace gdl {
         glfwSetInputMode(this->window, GLFW_CURSOR, (int) gdl::CursorState::Visible);
     }
 
+    void MouseController::focus() {
+        glfwSetInputMode(this->window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+        this->focused = true;
+    }
+
+    void MouseController::loseFocus() {
+        glfwSetInputMode(this->window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+        this->focused = false;
+    }
+
+    bool MouseController::isFocused() const {
+        return this->focused;
+    }
+
     void MouseController::setMoveCallback(std::function<void(double, double)> callbackHandler) {
         std::get<0>(this->callbacks) = std::move(callbackHandler);
     }
@@ -52,44 +47,133 @@ namespace gdl {
         std::get<1>(this->callbacks).emplace_back(button, type, std::move(callbackHandler));
     }
 
-    void MouseController::registerCallbacks() {
-        glfwSetCursorPosCallback(this->window, [](GLFWwindow *mWindow, double x, double y) {
-            auto &data = std::get<1>(*static_cast<TCallbacks *>(glfwGetWindowUserPointer(mWindow)));
-            std::get<0>(data)(x, y);
-        });
-        glfwSetMouseButtonCallback(this->window, [](GLFWwindow *mWindow, int button, int action, int) {
-            auto &mCallbacks = std::get<1>(*static_cast<TCallbacks *>(glfwGetWindowUserPointer(mWindow)));
-            auto &clickCallbacks = std::get<1>(mCallbacks);
-            for (auto &f: clickCallbacks) {
-                if ((int)std::get<1>(f) == action && (int)std::get<0>(f) == button) {
-                    double x, y;
-                    glfwGetCursorPos(mWindow, &x, &y);
-                    std::get<2>(f)(x, y);
-                }
-            }
-        });
-
-    }
-
     const TMouseCallbacks &MouseController::getCallbacks() {
         return this->callbacks;
     }
 
-    KeyboardController &WindowController::keyboardController() {
-        return this->keyboard;
+    WindowController::WindowController(GLFWwindow *window): window(window), mouse(window), renderer(this) {
+        glfwGetWindowSize(this->window, &this->width, &this->height);
+        this->proj = glm::perspective(this->getCamera().getFov(), 1.0f * width / height, 0.1f, 100.0f);
+        this->camera = Camera();
+        this->camera.setSpeed(5.0f);
+        glfwSetFramebufferSizeCallback(this->window, [] (GLFWwindow* rWindow, int w, int h) {
+            auto windowController = static_cast<WindowController*>(glfwGetWindowUserPointer(rWindow));
+            glViewport(0, 0, w, h);
+            windowController->width = w;
+            windowController->height = h;
+            windowController->proj = glm::perspective(windowController->getCamera().getFov(), 1.0f * w / h, 0.1f, 100.0f);
+        });
+
+        this->mouseController().setMoveCallback([this](double x, double y) {
+            this->camera.mouseRotation(x - lastMouseX, lastMouseY - y);
+            this->camera.update();
+            lastMouseX = x;
+            lastMouseY = y;
+        });
+        this->mouseController().focus();
+        glfwSetCursorPosCallback(this->window, [](GLFWwindow *mWindow, double x, double y) {
+            auto windowController = static_cast<WindowController*>(glfwGetWindowUserPointer(mWindow));
+            if (windowController->mouseController().isFocused()) {
+                auto& data = windowController->getMouseCallbacks();
+                std::get<0>(data)(x, y);
+            }
+        });
+        glfwSetMouseButtonCallback(this->window, [](GLFWwindow *mWindow, int button, int action, int) {
+            auto windowController = static_cast<WindowController*>(glfwGetWindowUserPointer(mWindow));
+            if (windowController->mouseController().isFocused()) {
+                auto& clickCallbacks = std::get<1>(windowController->getMouseCallbacks());
+                for (auto &f: clickCallbacks) {
+                    if ((int) std::get<1>(f) == action && (int) std::get<0>(f) == button) {
+                        double x, y;
+                        glfwGetCursorPos(mWindow, &x, &y);
+                        std::get<2>(f)(x, y);
+                    }
+                }
+            } else {
+                if (action == (int)gdl::EventType::Press && button == (int)gdl::MouseButton::Left) {
+                    windowController->mouseController().focus();
+                }
+            }
+        });
+        this->registerCallbacks();
     }
 
-    MouseController &WindowController::mouseController() {
+    void WindowController::handleInput(const TimeManager& tm) {
+        if (glfwGetKey(window, (int)gdl::KeyboardKey::Escape) == GLFW_PRESS) {
+            this->mouseController().loseFocus();
+        }
+        if (glfwGetKey(window, (int)gdl::KeyboardKey::W) == GLFW_PRESS) {
+            this->camera.move(Forward, tm);
+            this->camera.update();
+        }
+        if (glfwGetKey(window, (int)gdl::KeyboardKey::S) == GLFW_PRESS) {
+            this->camera.move(Backward, tm);
+            this->camera.update();
+        }
+        if (glfwGetKey(window, (int)gdl::KeyboardKey::A) == GLFW_PRESS) {
+            this->camera.move(Left, tm);
+            this->camera.update();
+        }
+        if (glfwGetKey(window, (int)gdl::KeyboardKey::D) == GLFW_PRESS) {
+            this->camera.move(Right, tm);
+            this->camera.update();
+        }
+        if (glfwGetKey(window, (int)gdl::KeyboardKey::LeftShift) == GLFW_PRESS) {
+            this->camera.setSpeed(15.0f);
+        } else {
+            this->camera.setSpeed(5.0f);
+        }
+        if (glfwGetKey(window, (int)gdl::KeyboardKey::P) == GLFW_PRESS) {
+            std::cout << "Camera: \n\tposition: " << this->camera.getPos().x << " "
+            << this->camera.getPos().y << " "
+            << this->camera.getPos().z
+            << "\n\t\tpitch: " << this->camera.getPitch()
+            << "\n\t\tyaw: " << this->camera.getYaw()
+            << std::endl;
+        }
+    }
+
+    void WindowController::update(const TimeManager& tm) {
+        this->handleInput(tm);
+    }
+
+    void WindowController::render(Scene* scene) {
+        this->camera.getShader().use();
+        glm::mat4 model = glm::mat4(1.0f);
+        this->camera.getShader().setUniformMat4f("u_Proj", this->getProjection());
+        this->camera.getShader().setUniformMat4f("u_Model", model);
+        this->renderer.render(&this->camera, scene);
+        glfwSwapBuffers(this->window);
+    }
+
+    bool WindowController::shouldClose() {
+        return glfwWindowShouldClose(this->window);
+    }
+
+    void WindowController::clear() {
+        glClearColor(1.0, 1.0, 1.0, 1.0);
+        glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+    }
+
+    MouseController& WindowController::mouseController() {
         return this->mouse;
     }
 
+    Camera& WindowController::getCamera() {
+        return this->camera;
+    }
+
+    const glm::mat4& WindowController::getProjection() {
+        return this->proj;
+    }
+
+    TMouseCallbacks& WindowController::getMouseCallbacks() {
+        return this->callbacks;
+    }
+
     void WindowController::registerCallbacks() {
-        this->keyboard.registerCallbacks();
-        this->mouse.registerCallbacks();
+        this->callbacks = this->mouse.getCallbacks();
 
-        std::get<0>(this->callbacks) = this->keyboard.getCallbacks();
-        std::get<1>(this->callbacks) = this->mouse.getCallbacks();
-
-        glfwSetWindowUserPointer(this->window, &this->callbacks);
+        glfwSetWindowUserPointer(this->window, this);
     }
 }
