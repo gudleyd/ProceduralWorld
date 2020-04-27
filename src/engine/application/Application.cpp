@@ -23,8 +23,6 @@ namespace gdl {
 
         if (glewInit() != GLEW_OK)
             throw std::runtime_error("Cannot init glew");
-
-        glfwWindowHint(GLFW_SAMPLES, 4);
     }
 
     void Application::run() {
@@ -32,12 +30,18 @@ namespace gdl {
         TimeManager timeManager;
         WindowController windowController(this->mainWindow);
 
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA_SATURATE, GL_ONE);
         glEnable(GL_DEPTH_TEST);
         glEnable(GL_LESS);
         glEnable(GL_MULTISAMPLE);
+        glEnable(GL_CULL_FACE);
+        glCullFace(GL_BACK);
+        glFrontFace(GL_CW);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         Scene scene;
-        scene.addObject(std::make_shared<BlockWorld>());
+        auto bw1 = std::make_shared<BlockWorld>();
+        scene.addObject(bw1);
         while (!windowController.shouldClose()) {
             timeManager.tick();
             windowController.clear();

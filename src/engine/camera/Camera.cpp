@@ -32,6 +32,10 @@ namespace gdl {
         this->view = glm::lookAt(this->position, this->position + this->front, this->up);
     }
 
+    const glm::vec3& Camera::getDirection() {
+        return this->front;
+    }
+
     void Camera::move(const glm::vec3& offset) {
         this->position += offset;
     }

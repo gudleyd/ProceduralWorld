@@ -18,6 +18,7 @@ namespace gdl {
 
     const Color waterBlockColor = Color(0.0, 0.0, 1.0, 1.0);
     const Color grassBlockColor = Color(0.0, 1.0, 0.0, 1.0);
+    const Color stoneBlockColor = Color(149.0f / 255, 148.0f / 255, 139.0f / 255, 1.0);
 
     struct BlockWorldSize {
         BlockWorldSize(int x, int y, int z): x(x), y(y), z(z) { };
@@ -30,8 +31,10 @@ namespace gdl {
         explicit BlockWorld(BlockWorldSize size): size(size) { };
         void render(Camera *camera) override;
         void update(const TimeManager& tm, GLFWwindow* window) override;
+        void setOffset(int newOffsetX, int newOffsetZ);
     private:
         float scale = 2.0f;
+        int offsetX = 0, offsetZ = 0;
         void generate();
         BlockWorldSize size;
         Mesh blockMesh;

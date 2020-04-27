@@ -76,15 +76,26 @@ namespace gdl {
         return shaderCode;
     }
 
-    void Shader::setUniform3f(const std::string& name, float v0, float v1, float v2) const {
-        glUniform3f(glGetUniformLocation(this->program, name.c_str()), v0, v1, v2);
+    void Shader::setUniform3f(const std::string& name, float v0, float v1, float v2) {
+        glUniform3f(getAttribLocation(name), v0, v1, v2);
     }
 
-    void Shader::setUniform4f(const std::string& name, float v0, float v1, float v2, float v3) const {
-        glUniform4f(glGetUniformLocation(this->program, name.c_str()), v0, v1, v2, v3);
+    void Shader::setUniform4f(const std::string& name, float v0, float v1, float v2, float v3) {
+        glUniform4f(getAttribLocation(name), v0, v1, v2, v3);
     }
 
-    void Shader::setUniformMat4f(const std::string& name, const glm::mat4& matrix) const {
-        glUniformMatrix4fv(glGetUniformLocation(this->program, name.c_str()), 1, GL_FALSE, &matrix[0][0]);
+    void Shader::setUniformMat4f(const std::string& name, const glm::mat4& matrix) {
+        glUniformMatrix4fv(getAttribLocation(name), 1, GL_FALSE, &matrix[0][0]);
+    }
+
+    GLint Shader::getAttribLocation(const std::string &name) {
+        if (this->attribCache.count(name)) return this->attribCache[name];
+
+        GLint location = glGetUniformLocation(this->program, name.c_str());
+        if (location != -1) {
+            this->attribCache[name] = location;
+            return location;
+        }
+        throw std::runtime_error("Cannot find attrib with name " + name);
     }
 }

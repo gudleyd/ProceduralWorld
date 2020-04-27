@@ -5,16 +5,19 @@ in vec3 fragNormal;
 
 uniform vec3 u_LightPos;
 uniform vec3 u_LightColor;
+uniform vec3 u_LightDirection;
+uniform vec3 u_ViewPos;
 
 void main(void) {
-	float ambientStrength = 0.5;
-	vec3 ambient = ambientStrength * u_LightColor;
+	vec3 ambientColor = vec3(0.5, 0.5, 0.5) * f_color;
 
-	vec3 norm = normalize(fragNormal);
-	vec3 lightDir = normalize(u_LightPos - fragPos);
-	float diff = max(dot(norm, lightDir), 0.0);
-	vec3 diffuse = diff * u_LightColor;
+	float cosTheta = clamp(dot(fragNormal, u_LightDirection), 0, 1);
+	vec3 diffuseColor = f_color * u_LightColor * 0.6 * cosTheta;
 
+	vec3 viewDir = normalize(u_ViewPos - fragPos);
+	vec3 halfwayDir = normalize(u_LightDirection + viewDir);
+	float spec = pow(max(dot(fragNormal, halfwayDir), 0.0), 16.0);
+	vec3 specularColor = u_LightColor * spec;
 
-	gl_FragColor = vec4((ambient + diffuse), 1.0f) * vec4(f_color.r, f_color.g, f_color.b, 1.0);
+	gl_FragColor = vec4(specularColor + ambientColor + diffuseColor, 1.0f);
 }

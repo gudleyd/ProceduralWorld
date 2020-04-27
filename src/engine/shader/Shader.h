@@ -8,6 +8,7 @@
 #include <fstream>
 #include <sstream>
 #include <stdexcept>
+#include <unordered_map>
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
@@ -23,13 +24,16 @@ namespace gdl {
         void use() const;
         void stop() const;
         [[nodiscard]] unsigned int getId() const;
-        void setUniform4f(const std::string& name, float v0, float v1, float v2, float v3) const;
-        void setUniformMat4f(const std::string& name, const glm::mat4& matrix) const;
-        void setUniform3f(const std::string& name, float v0, float v1, float v2) const;
+        void setUniform4f(const std::string& name, float v0, float v1, float v2, float v3);
+        void setUniformMat4f(const std::string& name, const glm::mat4& matrix);
+        void setUniform3f(const std::string& name, float v0, float v1, float v2);
 
         static void compileShader(unsigned int shaderId, const std::string& shaderCode);
         static std::string readShaderCode(const std::string& path);
     private:
         unsigned int program;
+        std::unordered_map<std::string, GLint> attribCache;
+
+        GLint getAttribLocation(const std::string& name);
     };
 }

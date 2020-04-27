@@ -2,10 +2,13 @@
 // Created by lebedev-ivan on 25.04.2020.
 //
 
+#include <iostream>
 #include "BlockWorld.h"
 
 #include "../procedural/PerlinNoise.h"
 #include "../events/Events.h"
+#include "../heightmap/HeightMap.h"
+
 
 namespace gdl {
 
@@ -21,30 +24,42 @@ namespace gdl {
 
     void BlockWorld::update(const TimeManager& tm, GLFWwindow* window) {
         if (glfwGetKey(window, (int)gdl::KeyboardKey::KpAdd) == GLFW_PRESS) {
-            this->scale -= 0.1f;
+            this->scale *= 0.75f;
             this->blockMesh.clear();
             this->generate();
         }
         if (glfwGetKey(window, (int)gdl::KeyboardKey::KpSubtract) == GLFW_PRESS) {
-            this->scale += 0.1f;
+            this->scale *= 1.33f;
             this->blockMesh.clear();
             this->generate();
         }
     }
 
+    void BlockWorld::setOffset(int newOffsetX, int newOffsetZ) {
+        this->offsetZ = newOffsetZ;
+        this->offsetX = newOffsetX;
+        this->blockMesh.clear();
+        this->generate();
+    }
+
     void BlockWorld::generate() {
-        PerlinNoise pn(57u);
+        double time = glfwGetTime();
         float height[size.x][size.z];
         Color color[size.x][size.z];
+        HeightMap hm;
+        hm.generate(size.x, size.z, scale);
         for (int x = 0; x < size.x; ++x) {
             for (int z = 0; z < size.z; ++z) {
-                float n = floor(size.y * pn.noise(scale * x / size.x, scale * z / size.y, 0.0));
-                if (n <= 30.1f) {
-                    height[x][z] = 30.1f;
+                float n = floor(size.y * hm.get(z, x));
+                if (n <= 20) {
+                    height[x][z] = 20;
                     color[x][z] = waterBlockColor;
-                } else {
+                } else if (n < 40) {
                     height[x][z] = n;
                     color[x][z] = grassBlockColor;
+                } else {
+                    height[x][z] = n;
+                    color[x][z] = stoneBlockColor;
                 }
             }
         }
@@ -56,8 +71,9 @@ namespace gdl {
                 if (x + 1 < size.x && height[x + 1][z] < height[x][z]) faces |= 4u;
                 if (z - 1 >= 0 && height[x][z - 1] < height[x][z]) faces |= 2u;
                 if (z + 1 < size.z && height[x][z + 1] < height[x][z]) faces |= 1u;
-                this->blockMesh.addBlock(x, height[x][z], z, 1.0, color[x][z], faces);
+                this->blockMesh.addBlock(x + offsetX, height[x][z], z + offsetZ, 1.0, color[x][z], faces);
             }
         }
     }
+
 }

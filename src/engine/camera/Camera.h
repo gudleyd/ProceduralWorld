@@ -35,6 +35,8 @@ namespace gdl {
         void move(CameraMovementDirection, const TimeManager&);
         void mouseRotation(float x, float y);
 
+        const glm::vec3& getDirection();
+
         void setSpeed(float);
         [[nodiscard]] float getSpeed() const;
 

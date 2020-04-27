@@ -26,22 +26,22 @@ namespace gdl {
             {(x*size) + -halfSize, (y*size) + -halfSize, (z*size) + halfSize, // front
             (x*size) + -halfSize, (y*size) + halfSize, (z*size) + halfSize,
             (x*size) + halfSize, (y*size) + halfSize, (z*size) + halfSize,
-            (x*size) + -halfSize, (y*size) + -halfSize, (z*size) + halfSize,
             (x*size) + halfSize, (y*size) + -halfSize, (z*size) + halfSize,
+            (x*size) + -halfSize, (y*size) + -halfSize, (z*size) + halfSize,
             (x*size) + halfSize, (y*size) + halfSize, (z*size) + halfSize},
 
-            {(x*size) + -halfSize, (y*size) + -halfSize, (z*size) + -halfSize, // rear
-            (x*size) + -halfSize, (y*size) + halfSize, (z*size) + -halfSize,
+            {(x*size) + -halfSize, (y*size) + halfSize, (z*size) + -halfSize,
+            (x*size) + -halfSize, (y*size) + -halfSize, (z*size) + -halfSize, // rear
             (x*size) + halfSize, (y*size) + halfSize, (z*size) + -halfSize,
             (x*size) + -halfSize, (y*size) + -halfSize, (z*size) + -halfSize,
             (x*size) + halfSize, (y*size) + -halfSize, (z*size) + -halfSize,
             (x*size) + halfSize, (y*size) + halfSize, (z*size) + -halfSize},
 
-            {(x*size) + halfSize, (y*size) + -halfSize, (z*size) + halfSize, // right
-            (x*size) + halfSize, (y*size) + -halfSize, (z*size) + -halfSize,
+            {(x*size) + halfSize, (y*size) + -halfSize, (z*size) + -halfSize,
+            (x*size) + halfSize, (y*size) + -halfSize, (z*size) + halfSize, // right
+            (x*size) + halfSize, (y*size) + halfSize, (z*size) + -halfSize,
             (x*size) + halfSize, (y*size) + halfSize, (z*size) + -halfSize,
             (x*size) + halfSize, (y*size) + -halfSize, (z*size) + halfSize,
-            (x*size) + halfSize, (y*size) + halfSize, (z*size) + -halfSize,
             (x*size) + halfSize, (y*size) + halfSize, (z*size) + halfSize},
 
             {(x*size) + -halfSize, (y*size) + -halfSize, (z*size) + halfSize, // left
@@ -58,11 +58,11 @@ namespace gdl {
             (x*size) + -halfSize, (y*size) + halfSize, (z*size) + -halfSize,
             (x*size) + halfSize, (y*size) + halfSize, (z*size) + -halfSize},
 
-            {(x*size) + -halfSize, (y*size) + -halfSize, (z*size) + halfSize, // bottom
+            {(x*size) + -halfSize, (y*size) + -halfSize, (z*size) + -halfSize,
+            (x*size) + -halfSize, (y*size) + -halfSize, (z*size) + halfSize, // bottom
+            (x*size) + halfSize, (y*size) + -halfSize, (z*size) + halfSize,
             (x*size) + -halfSize, (y*size) + -halfSize, (z*size) + -halfSize,
             (x*size) + halfSize, (y*size) + -halfSize, (z*size) + halfSize,
-            (x*size) + halfSize, (y*size) + -halfSize, (z*size) + halfSize,
-            (x*size) + -halfSize, (y*size) + -halfSize, (z*size) + -halfSize,
             (x*size) + halfSize, (y*size) + -halfSize, (z*size) + -halfSize}
         };
 

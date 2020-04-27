@@ -26,6 +26,6 @@ namespace gdl {
         void addObject(std::shared_ptr<IRenderable> newObject);
     public:
         std::vector<std::shared_ptr<IRenderable>> objects;
-        LightSource lightSource = LightSource(Color(1.0, 1.0, 1.0, 1.0), glm::vec3{0, 10.0, 0}, 1.0);
+        LightSource lightSource = LightSource(Color(1.0, 1.0, 1.0, 0.0), glm::vec3{10, 50.0, 0}, glm::vec3{1.0, 1.0, 0.0}, 1.0);
     };
 }
