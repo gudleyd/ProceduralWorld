@@ -35,7 +35,7 @@ namespace gdl {
         file.close();
     }
 
-    void HeightMap::generate(int w, int h, float scale) {
+    void HeightMap::generate(int w, int h, float scale, int offsetX, int offsetY) {
         if (data != nullptr) free(data);
         width = w;
         height = h;
@@ -43,7 +43,7 @@ namespace gdl {
         PerlinNoise pn(57u);
         for (int i = 0; i < width; ++i) {
             for (int j = 0; j < height; ++j) {
-                data[i * height + j] = pn.noise(scale * i / width, scale * j / height, 1.0f);
+                data[i * height + j] = pn.noise(scale * (i + offsetX) / width, scale * (j + offsetY) / height, 1.0f);
             }
         }
     }

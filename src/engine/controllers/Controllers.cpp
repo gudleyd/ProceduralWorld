@@ -99,31 +99,31 @@ namespace gdl {
     }
 
     void WindowController::handleInput(const TimeManager& tm) {
-        if (glfwGetKey(window, (int)gdl::KeyboardKey::Escape) == GLFW_PRESS) {
+        if (KeyboardEventManager::shared().isPressed(KeyboardKey::Escape)) {
             this->mouseController().loseFocus();
         }
-        if (glfwGetKey(window, (int)gdl::KeyboardKey::W) == GLFW_PRESS) {
+        if (KeyboardEventManager::shared().isPressed(KeyboardKey::W)) {
             this->camera.move(Forward, tm);
             this->camera.update();
         }
-        if (glfwGetKey(window, (int)gdl::KeyboardKey::S) == GLFW_PRESS) {
+        if (KeyboardEventManager::shared().isPressed(KeyboardKey::S)) {
             this->camera.move(Backward, tm);
             this->camera.update();
         }
-        if (glfwGetKey(window, (int)gdl::KeyboardKey::A) == GLFW_PRESS) {
+        if (KeyboardEventManager::shared().isPressed(KeyboardKey::A)) {
             this->camera.move(Left, tm);
             this->camera.update();
         }
-        if (glfwGetKey(window, (int)gdl::KeyboardKey::D) == GLFW_PRESS) {
+        if (KeyboardEventManager::shared().isPressed(KeyboardKey::D)) {
             this->camera.move(Right, tm);
             this->camera.update();
         }
-        if (glfwGetKey(window, (int)gdl::KeyboardKey::LeftShift) == GLFW_PRESS) {
+        if (KeyboardEventManager::shared().isPressed(KeyboardKey::LeftShift)) {
             this->camera.setSpeed(15.0f);
         } else {
             this->camera.setSpeed(5.0f);
         }
-        if (glfwGetKey(window, (int)gdl::KeyboardKey::P) == GLFW_PRESS) {
+        if (KeyboardEventManager::shared().isPressed(KeyboardKey::P)) {
             std::cout << "Camera: \n\tposition: " << this->camera.getPos().x << " "
             << this->camera.getPos().y << " "
             << this->camera.getPos().z
@@ -138,12 +138,17 @@ namespace gdl {
     }
 
     void WindowController::render(Scene* scene) {
+        glViewport(0, 0, width, height);
         this->camera.getShader().use();
         glm::mat4 model = glm::mat4(1.0f);
         this->camera.getShader().setUniformMat4f("u_Proj", this->getProjection());
         this->camera.getShader().setUniformMat4f("u_Model", model);
         this->renderer.render(&this->camera, scene);
         glfwSwapBuffers(this->window);
+    }
+
+    void WindowController::prepareInput() {
+        KeyboardEventManager::shared().setCurrentWindow(this->window);
     }
 
     bool WindowController::shouldClose() {

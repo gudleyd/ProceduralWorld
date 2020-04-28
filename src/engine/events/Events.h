@@ -166,4 +166,29 @@ namespace gdl {
         Super = GLFW_MOD_SUPER,
         Length = 4
     };
+
+
+    class KeyboardEventManager {
+    public:
+        static KeyboardEventManager& shared() {
+            static KeyboardEventManager s;
+            return s;
+        }
+
+        bool isPressed(enum KeyboardKey key) {
+            return currentWindow != nullptr && glfwGetKey(currentWindow, (int)key) == GLFW_PRESS;
+        }
+
+        void setCurrentWindow(GLFWwindow *window) {
+            currentWindow = window;
+        }
+
+    private:
+        GLFWwindow *currentWindow;
+        KeyboardEventManager() {  }
+        ~KeyboardEventManager() {  }
+
+        KeyboardEventManager(KeyboardEventManager const&) = delete;
+        KeyboardEventManager& operator= (KeyboardEventManager const&) = delete;
+    };
 }

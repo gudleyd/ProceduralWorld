@@ -23,6 +23,11 @@ namespace gdl {
     }
 
     void Scene::update(const TimeManager& tm, GLFWwindow* window) {
+        glm::mat4 rotationMat(1);
+        glm::vec3 lightDir = this->lightSource.getDirection();
+        rotationMat = glm::rotate(rotationMat, 0.001f, glm::vec3(0.0, 1.0, 0.0));
+        lightDir = glm::vec3(rotationMat * glm::vec4(lightDir, 1.0));
+        this->lightSource.setDirection(lightDir);
         for (const auto& obj: this->objects) {
             obj->update(tm, window);
         }

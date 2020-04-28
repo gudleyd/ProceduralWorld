@@ -49,7 +49,6 @@ namespace gdl {
         glShaderSource(shaderId, 1, &sourceCode, nullptr);
         glCompileShader(shaderId);
 
-        // Todo:: Make debug only
         GLint result = GL_FALSE;
         glGetShaderiv(shaderId, GL_COMPILE_STATUS, &result);
         if (result != GL_TRUE) {

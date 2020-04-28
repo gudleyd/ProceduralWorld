@@ -6,6 +6,8 @@ uniform mat4 u_Proj;
 uniform mat4 u_View;
 uniform mat4 u_Model;
 
+uniform vec3 colors[256];
+
 varying vec3 f_color;
 varying vec3 fragPos;
 varying vec3 fragNormal;

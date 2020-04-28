@@ -62,6 +62,7 @@ namespace gdl {
         Camera& getCamera();
         const glm::mat4& getProjection();
 
+        void prepareInput();
 
         TMouseCallbacks& getMouseCallbacks();
         void registerCallbacks();

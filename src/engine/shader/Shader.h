@@ -28,12 +28,13 @@ namespace gdl {
         void setUniformMat4f(const std::string& name, const glm::mat4& matrix);
         void setUniform3f(const std::string& name, float v0, float v1, float v2);
 
+        GLint getAttribLocation(const std::string& name);
+
         static void compileShader(unsigned int shaderId, const std::string& shaderCode);
         static std::string readShaderCode(const std::string& path);
     private:
         unsigned int program;
         std::unordered_map<std::string, GLint> attribCache;
 
-        GLint getAttribLocation(const std::string& name);
     };
 }

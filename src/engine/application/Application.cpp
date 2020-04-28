@@ -30,6 +30,7 @@ namespace gdl {
         TimeManager timeManager;
         WindowController windowController(this->mainWindow);
 
+        glEnable(GL_STENCIL_TEST);
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA_SATURATE, GL_ONE);
         glEnable(GL_DEPTH_TEST);
@@ -50,6 +51,8 @@ namespace gdl {
 
             windowController.update(timeManager);
             windowController.render(&scene);
+
+            windowController.prepareInput();
 
             glfwPollEvents();
         }

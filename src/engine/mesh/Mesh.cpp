@@ -109,39 +109,39 @@ namespace gdl {
                 0, -1, 0,
                 0, -1, 0}
         };
-        int drawnFaces = 0;
+        int drownFaces = 0;
         if (faces & 1u) {
             vertices.insert(vertices.end(), vertexBufferData[0], vertexBufferData[0] + 18);
             normals.insert(normals.end(), normalBufferData[0], normalBufferData[0] + 18);
-            ++drawnFaces;
+            ++drownFaces;
         }
         if (faces & 2u) {
             vertices.insert(vertices.end(), vertexBufferData[1], vertexBufferData[1] + 18);
             normals.insert(normals.end(), normalBufferData[1], normalBufferData[1] + 18);
-            ++drawnFaces;
+            ++drownFaces;
         }
         if (faces & 4u) {
             vertices.insert(vertices.end(), vertexBufferData[2], vertexBufferData[2] + 18);
             normals.insert(normals.end(), normalBufferData[2], normalBufferData[2] + 18);
-            ++drawnFaces;
+            ++drownFaces;
         }
         if (faces & 8u) {
             vertices.insert(vertices.end(), vertexBufferData[3], vertexBufferData[3] + 18);
             normals.insert(normals.end(), normalBufferData[3], normalBufferData[3] + 18);
-            ++drawnFaces;
+            ++drownFaces;
         }
         if (faces & 16u) {
             vertices.insert(vertices.end(), vertexBufferData[4], vertexBufferData[4] + 18);
             normals.insert(normals.end(), normalBufferData[4], normalBufferData[4] + 18);
-            ++drawnFaces;
+            ++drownFaces;
         }
         if (faces & 32u) {
             vertices.insert(vertices.end(), vertexBufferData[5], vertexBufferData[5] + 18);
             normals.insert(normals.end(), normalBufferData[5], normalBufferData[5] + 18);
-            ++drawnFaces;
+            ++drownFaces;
         }
 
-        for (int triangleIndex = 0; triangleIndex < drawnFaces * 6; triangleIndex++) {
+        for (int triangleIndex = 0; triangleIndex < drownFaces * 6; triangleIndex++) {
             colors.push_back(color.r);
             colors.push_back(color.g);
             colors.push_back(color.b);
@@ -166,7 +166,7 @@ namespace gdl {
         glBindBuffer(GL_ARRAY_BUFFER, vbo_cube_normals);
         glBufferData(GL_ARRAY_BUFFER, normalsSize, nrmls, GL_STATIC_DRAW);
 
-        GLint attribute_coord3d = glGetAttribLocation(camera->getShader().getId(), "coord3d");
+        GLint attribute_coord3d = glGetAttribLocation(camera->getShader().getId(), "coord3d");//camera->getShader().getAttribLocation("coord3d");
         GLint attribute_v_color = glGetAttribLocation(camera->getShader().getId(), "v_color");
         GLint attribute_normal = glGetAttribLocation(camera->getShader().getId(), "normal");
 

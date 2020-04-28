@@ -22,7 +22,7 @@ namespace gdl {
 
         void write(const std::string& path);
 
-        void generate(int w, int h, float scale);
+        void generate(int w, int h, float scale, int offsetX = 0, int offsetY = 0);
         float get(int x, int z);
 
         int getWidth();
