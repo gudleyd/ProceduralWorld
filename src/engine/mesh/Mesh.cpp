@@ -20,7 +20,7 @@ namespace gdl {
         glDeleteBuffers(1, &vbo_cube_normals);
     }
 
-    void Mesh::addBlock(float x, float y, float z, float size, const Color& color, uint8_t faces) {
+    void Mesh::addBlock(float x, float y, float z, float size, float colorIndex, uint8_t faces) {
         float halfSize = size / 2;
         GLfloat vertexBufferData[6][18] = {
             {(x*size) + -halfSize, (y*size) + -halfSize, (z*size) + halfSize, // front
@@ -140,12 +140,8 @@ namespace gdl {
             normals.insert(normals.end(), normalBufferData[5], normalBufferData[5] + 18);
             ++drownFaces;
         }
-
-        for (int triangleIndex = 0; triangleIndex < drownFaces * 6; triangleIndex++) {
-            colors.push_back(color.r);
-            colors.push_back(color.g);
-            colors.push_back(color.b);
-        }
+        for (int i = 0; i < drownFaces * 6; ++i)
+            colors.push_back(colorIndex);
     }
 
     void Mesh::render(Camera* camera) {
@@ -158,17 +154,17 @@ namespace gdl {
         glBindBuffer(GL_ARRAY_BUFFER, vbo_cube_vertices);
         glBufferData(GL_ARRAY_BUFFER, vertexSize, vrts, GL_STATIC_DRAW);
 
-        GLsizeiptr colorSize = this->colors.size() * sizeof(GLfloat);
-        glBindBuffer(GL_ARRAY_BUFFER, vbo_cube_colors);
-        glBufferData(GL_ARRAY_BUFFER, colorSize, clrs, GL_STATIC_DRAW);
-
         GLsizeiptr normalsSize = this->normals.size() * sizeof(GLfloat);
         glBindBuffer(GL_ARRAY_BUFFER, vbo_cube_normals);
         glBufferData(GL_ARRAY_BUFFER, normalsSize, nrmls, GL_STATIC_DRAW);
 
-        GLint attribute_coord3d = glGetAttribLocation(camera->getShader().getId(), "coord3d");//camera->getShader().getAttribLocation("coord3d");
-        GLint attribute_v_color = glGetAttribLocation(camera->getShader().getId(), "v_color");
+        GLsizeiptr colorSize = this->colors.size() * sizeof(GLfloat);
+        glBindBuffer(GL_ARRAY_BUFFER, vbo_cube_colors);
+        glBufferData(GL_ARRAY_BUFFER, colorSize, clrs, GL_STATIC_DRAW);
+
+        GLint attribute_coord3d = glGetAttribLocation(camera->getShader().getId(), "coord3d");
         GLint attribute_normal = glGetAttribLocation(camera->getShader().getId(), "normal");
+        GLint attribute_v_color = glGetAttribLocation(camera->getShader().getId(), "colorIndex");
 
         glEnableVertexAttribArray(attribute_coord3d);
         glBindBuffer(GL_ARRAY_BUFFER, vbo_cube_vertices);
@@ -176,13 +172,13 @@ namespace gdl {
 
         glEnableVertexAttribArray(attribute_v_color);
         glBindBuffer(GL_ARRAY_BUFFER, vbo_cube_colors);
-        glVertexAttribPointer(attribute_v_color, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
+        glVertexAttribPointer(attribute_v_color, 1, GL_FLOAT, GL_FALSE, 0, nullptr);
 
         glEnableVertexAttribArray(attribute_normal);
         glBindBuffer(GL_ARRAY_BUFFER, vbo_cube_normals);
         glVertexAttribPointer(attribute_normal, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
 
-        glDrawArrays(GL_TRIANGLES, 0, this->vertices.size());
+        glDrawArrays(GL_TRIANGLES, 0, this->vertices.size() / 3);
 
         glDisableVertexAttribArray(attribute_coord3d);
         glDisableVertexAttribArray(attribute_v_color);
@@ -190,9 +186,9 @@ namespace gdl {
     }
 
     void Mesh::clear() {
-        glDeleteBuffers(1, &vbo_cube_vertices);
-        glDeleteBuffers(1, &vbo_cube_colors);
-        glDeleteBuffers(1, &vbo_cube_normals);
+//        glDeleteBuffers(1, &vbo_cube_vertices);
+//        glDeleteBuffers(1, &vbo_cube_colors);
+//        glDeleteBuffers(1, &vbo_cube_normals);
 
         this->vertices.clear();
         this->colors.clear();

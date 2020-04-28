@@ -19,7 +19,7 @@ namespace gdl {
     public:
         Mesh();
         ~Mesh();
-        void addBlock(float x, float y, float z, float size, const Color& color, uint8_t faces = 63);
+        void addBlock(float x, float y, float z, float size, float colorIndex, uint8_t faces = 63);
         void render(Camera*);
         void clear();
 
@@ -27,8 +27,8 @@ namespace gdl {
     private:
         GLuint vbo_cube_vertices = 0, vbo_cube_colors = 0, vbo_cube_normals = 0;
         std::vector<GLfloat> vertices;
-        std::vector<GLfloat> colors;
         std::vector<GLfloat> normals;
+        std::vector<GLfloat> colors;
     };
 
 }

@@ -2,25 +2,28 @@
 // Created by lebedev-ivan on 25.04.2020.
 //
 
-#include <iostream>
 #include "BlockWorld.h"
 
-#include "../procedural/PerlinNoise.h"
+#include <thread>
+
 #include "../events/Events.h"
-#include "../heightmap/HeightMap.h"
 
 
 namespace gdl {
 
-    BlockWorld::BlockWorld(): size(BlockWorldSize(8, 8)) {
+    BlockWorld::BlockWorld(): size(BlockWorldSize(6, 4)) {
         this->model = glm::scale(glm::mat4{1.0f}, glm::vec3{0.1f});
         for (int i = 0; i < size.x * size.y; ++i) {
-            chunks.emplace_back(Chunk(ChunkSize(64, 64, 64)));
+            chunks.emplace_back(Chunk(ChunkSize(150, 256, 150)));
         }
         this->generate();
     }
 
     void BlockWorld::render(Camera *camera) {
+        GLuint samplerLocation = glGetUniformLocation(camera->getShader().getId(), "colorRamp");
+        glUniform1i(samplerLocation, 0);
+        glActiveTexture(GL_TEXTURE0 + 0);
+        glBindTexture(GL_TEXTURE_1D, BlockGlobals::shared().getId());
         camera->getShader().setUniformMat4f("u_Model", this->model);
         for (auto& chunk: chunks) {
             chunk.render(camera);
@@ -30,20 +33,23 @@ namespace gdl {
     void BlockWorld::update(const TimeManager& tm, GLFWwindow* window) {
         if (KeyboardEventManager::shared().isPressed(KeyboardKey::KpAdd)) {
             this->scale *= 0.75f;
-            this->generate();
+            this->generate(0, 0);
         }
         if (KeyboardEventManager::shared().isPressed(KeyboardKey::KpSubtract)) {
             this->scale *= 1.33f;
-            this->generate();
+            this->generate(0, 0);
         }
     }
 
-    void BlockWorld::generate() {
+    void BlockWorld::generate(float offsetX, float offsetY) {
+        std::vector<std::thread> threads;
         for (int i = 0; i < size.x; ++i) {
             for (int j = 0; j < size.y; ++j) {
-                chunks[i * size.y + j].generate(i * 64, j * 64, scale);
+                threads.emplace_back(&Chunk::generate, std::ref(chunks[i * size.y + j]), i * 128, j * 128, scale, offsetX, offsetY);
             }
         }
+        for (auto& t: threads)
+            t.join();
     }
 
 }

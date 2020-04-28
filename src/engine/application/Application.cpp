@@ -30,6 +30,8 @@ namespace gdl {
         TimeManager timeManager;
         WindowController windowController(this->mainWindow);
 
+        glfwSwapInterval(0);
+
         glEnable(GL_STENCIL_TEST);
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA_SATURATE, GL_ONE);

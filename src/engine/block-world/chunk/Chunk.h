@@ -5,12 +5,9 @@
 #pragma once
 
 #include "../../mesh/Mesh.h"
+#include "../BlockTypes.h"
 
 namespace gdl {
-
-    const Color waterBlockColor = Color(0.0, 0.0, 1.0, 1.0);
-    const Color grassBlockColor = Color(0.0, 1.0, 0.0, 1.0);
-    const Color stoneBlockColor = Color(149.0f / 255, 148.0f / 255, 139.0f / 255, 1.0);
 
     struct ChunkSize {
         ChunkSize(int x, int y, int z): x(x), y(y), z(z) { };
@@ -22,7 +19,7 @@ namespace gdl {
         Chunk();
         explicit Chunk(ChunkSize size): size(size) { };
         void render(Camera *camera);
-        void generate(int offsetX, int offsetZ, float scale);
+        void generate(float offsetX, float offsetZ, float scale, float mapOffsetX = 0, float mapOffsetZ = 0);
     private:
         ChunkSize size;
         Mesh blockMesh;
