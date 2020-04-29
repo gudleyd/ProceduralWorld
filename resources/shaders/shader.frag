@@ -17,7 +17,7 @@ void main(void) {
 	vec3 viewDir = normalize(u_ViewPos - fragPos);
 	vec3 halfwayDir = normalize(u_LightDirection + viewDir);
 	float spec = pow(max(dot(fragNormal, halfwayDir), 0.0), 16.0);
-	vec3 specularColor = u_LightColor * spec * 0.1;
+	vec3 specularColor = u_LightColor * spec;
 
 	gl_FragColor = vec4(specularColor + ambientColor + diffuseColor, 1.0f);
 }

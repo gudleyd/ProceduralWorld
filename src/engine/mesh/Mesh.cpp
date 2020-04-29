@@ -3,6 +3,8 @@
 //
 
 #include <iostream>
+#include <thread>
+
 #include "Mesh.h"
 
 
@@ -12,12 +14,6 @@ namespace gdl {
         glGenBuffers(1, &vbo_cube_vertices);
         glGenBuffers(1, &vbo_cube_colors);
         glGenBuffers(1, &vbo_cube_normals);
-    }
-
-    Mesh::~Mesh() {
-        glDeleteBuffers(1, &vbo_cube_vertices);
-        glDeleteBuffers(1, &vbo_cube_colors);
-        glDeleteBuffers(1, &vbo_cube_normals);
     }
 
     void Mesh::addBlock(float x, float y, float z, float size, float colorIndex, uint8_t faces) {
@@ -142,25 +138,38 @@ namespace gdl {
         }
         for (int i = 0; i < drownFaces * 6; ++i)
             colors.push_back(colorIndex);
+
+        needRebind = true;
+
+    }
+
+    void Mesh::deleteBuffers() {
+        glDeleteBuffers(1, &vbo_cube_vertices);
+        glDeleteBuffers(1, &vbo_cube_colors);
+        glDeleteBuffers(1, &vbo_cube_normals);
     }
 
     void Mesh::render(Camera* camera) {
 
-        const GLfloat *vrts = &(this->vertices[0]);
-        const GLfloat *clrs = &(this->colors[0]);
-        const GLfloat *nrmls = &(this->normals[0]);
+        if (needRebind) {
+            const GLfloat *vrts = &(this->vertices[0]);
+            const GLfloat *clrs = &(this->colors[0]);
+            const GLfloat *nrmls = &(this->normals[0]);
 
-        GLsizeiptr vertexSize = this->vertices.size() * sizeof(GLfloat);
-        glBindBuffer(GL_ARRAY_BUFFER, vbo_cube_vertices);
-        glBufferData(GL_ARRAY_BUFFER, vertexSize, vrts, GL_STATIC_DRAW);
+            GLsizeiptr vertexSize = this->vertices.size() * sizeof(GLfloat);
+            glBindBuffer(GL_ARRAY_BUFFER, vbo_cube_vertices);
+            glBufferData(GL_ARRAY_BUFFER, vertexSize, vrts, GL_STATIC_DRAW);
 
-        GLsizeiptr normalsSize = this->normals.size() * sizeof(GLfloat);
-        glBindBuffer(GL_ARRAY_BUFFER, vbo_cube_normals);
-        glBufferData(GL_ARRAY_BUFFER, normalsSize, nrmls, GL_STATIC_DRAW);
+            GLsizeiptr normalsSize = this->normals.size() * sizeof(GLfloat);
+            glBindBuffer(GL_ARRAY_BUFFER, vbo_cube_normals);
+            glBufferData(GL_ARRAY_BUFFER, normalsSize, nrmls, GL_STATIC_DRAW);
 
-        GLsizeiptr colorSize = this->colors.size() * sizeof(GLfloat);
-        glBindBuffer(GL_ARRAY_BUFFER, vbo_cube_colors);
-        glBufferData(GL_ARRAY_BUFFER, colorSize, clrs, GL_STATIC_DRAW);
+            GLsizeiptr colorSize = this->colors.size() * sizeof(GLfloat);
+            glBindBuffer(GL_ARRAY_BUFFER, vbo_cube_colors);
+            glBufferData(GL_ARRAY_BUFFER, colorSize, clrs, GL_STATIC_DRAW);
+
+            needRebind = false;
+        }
 
         GLint attribute_coord3d = glGetAttribLocation(camera->getShader().getId(), "coord3d");
         GLint attribute_normal = glGetAttribLocation(camera->getShader().getId(), "normal");
@@ -178,7 +187,7 @@ namespace gdl {
         glBindBuffer(GL_ARRAY_BUFFER, vbo_cube_normals);
         glVertexAttribPointer(attribute_normal, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
 
-        glDrawArrays(GL_TRIANGLES, 0, this->vertices.size() / 3);
+        glDrawArraysInstanced(GL_TRIANGLES, 0, this->vertices.size() / 3, 1);
 
         glDisableVertexAttribArray(attribute_coord3d);
         glDisableVertexAttribArray(attribute_v_color);
@@ -186,13 +195,10 @@ namespace gdl {
     }
 
     void Mesh::clear() {
-//        glDeleteBuffers(1, &vbo_cube_vertices);
-//        glDeleteBuffers(1, &vbo_cube_colors);
-//        glDeleteBuffers(1, &vbo_cube_normals);
-
         this->vertices.clear();
         this->colors.clear();
         this->normals.clear();
+        needRebind = true;
     }
 
     void Mesh::mergeMeshes(Mesh &m1, const Mesh &m2) {

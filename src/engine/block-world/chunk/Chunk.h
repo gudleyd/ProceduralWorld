@@ -17,7 +17,7 @@ namespace gdl {
     class Chunk {
     public:
         Chunk();
-        explicit Chunk(ChunkSize size): size(size) { };
+        explicit Chunk(ChunkSize size);
         void render(Camera *camera);
         void generate(float offsetX, float offsetZ, float scale, float mapOffsetX = 0, float mapOffsetZ = 0);
     private:

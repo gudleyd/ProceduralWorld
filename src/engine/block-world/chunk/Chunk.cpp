@@ -13,7 +13,12 @@
 namespace gdl {
 
     Chunk::Chunk(): size(ChunkSize(64, 256, 64)) {
-        this->model = glm::scale(glm::mat4{1.0f}, glm::vec3{0.1f});
+        this->model = glm::scale(glm::mat4{1.0f}, glm::vec3{1.0f});
+    }
+
+    Chunk::Chunk(ChunkSize chunkSize): size(chunkSize) {
+        this->blockMesh = Mesh();
+        this->model = glm::scale(glm::mat4{1.0f}, glm::vec3{1.0f});
     }
 
     void Chunk::render(Camera *camera) {

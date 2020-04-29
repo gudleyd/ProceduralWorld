@@ -11,10 +11,10 @@
 
 namespace gdl {
 
-    BlockWorld::BlockWorld(): size(BlockWorldSize(6, 4)) {
+    BlockWorld::BlockWorld(): size(BlockWorldSize(10, 10)) {
         this->model = glm::scale(glm::mat4{1.0f}, glm::vec3{0.1f});
         for (int i = 0; i < size.x * size.y; ++i) {
-            chunks.emplace_back(Chunk(ChunkSize(150, 256, 150)));
+            chunks.emplace_back(ChunkSize(256, 256, 256));
         }
         this->generate();
     }
@@ -45,7 +45,7 @@ namespace gdl {
         std::vector<std::thread> threads;
         for (int i = 0; i < size.x; ++i) {
             for (int j = 0; j < size.y; ++j) {
-                threads.emplace_back(&Chunk::generate, std::ref(chunks[i * size.y + j]), i * 128, j * 128, scale, offsetX, offsetY);
+                threads.emplace_back(&Chunk::generate, std::ref(chunks[i * size.y + j]), i * 256, j * 256, scale, offsetX, offsetY);
             }
         }
         for (auto& t: threads)

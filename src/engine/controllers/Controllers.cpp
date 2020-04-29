@@ -53,7 +53,7 @@ namespace gdl {
 
     WindowController::WindowController(GLFWwindow *window): window(window), mouse(window), renderer(this) {
         glfwGetWindowSize(this->window, &this->width, &this->height);
-        this->proj = glm::perspective(this->getCamera().getFov(), 1.0f * width / height, 0.1f, 100.0f);
+        this->proj = glm::perspective(this->getCamera().getFov(), 1.0f * width / height, 0.1f, 1000.0f);
         this->camera = Camera();
         this->camera.setSpeed(5.0f);
         glfwSetFramebufferSizeCallback(this->window, [] (GLFWwindow* rWindow, int w, int h) {
@@ -61,7 +61,7 @@ namespace gdl {
             glViewport(0, 0, w, h);
             windowController->width = w;
             windowController->height = h;
-            windowController->proj = glm::perspective(windowController->getCamera().getFov(), 1.0f * w / h, 0.1f, 100.0f);
+            windowController->proj = glm::perspective(windowController->getCamera().getFov(), 1.0f * w / h, 0.1f, 1000.0f);
         });
 
         this->mouseController().setMoveCallback([this](double x, double y) {

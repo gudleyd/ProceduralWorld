@@ -13,7 +13,7 @@ namespace gdl {
         if (!glfwInit())
             throw std::runtime_error("Cannot init glfw");
 
-        this->mainWindow = glfwCreateWindow(800, 600, "Hello, world", nullptr, nullptr);
+        this->mainWindow = glfwCreateWindow(1200, 900, "Hello, world", nullptr, nullptr);
         if (!this->mainWindow) {
             glfwTerminate();
             throw std::runtime_error("Cannot open the window");
@@ -32,19 +32,16 @@ namespace gdl {
 
         glfwSwapInterval(0);
 
-        glEnable(GL_STENCIL_TEST);
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA_SATURATE, GL_ONE);
         glEnable(GL_DEPTH_TEST);
         glEnable(GL_LESS);
         glEnable(GL_MULTISAMPLE);
         glEnable(GL_CULL_FACE);
         glCullFace(GL_BACK);
         glFrontFace(GL_CW);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         Scene scene;
         auto bw1 = std::make_shared<BlockWorld>();
         scene.addObject(bw1);
+        unsigned int cnt = 0;
         while (!windowController.shouldClose()) {
             timeManager.tick();
             windowController.clear();
@@ -55,6 +52,10 @@ namespace gdl {
             windowController.render(&scene);
 
             windowController.prepareInput();
+
+            if ((++cnt & 31u) == 0) {
+                printf("frameTime: %f\n", timeManager.timeSinceLastTick());
+            }
 
             glfwPollEvents();
         }

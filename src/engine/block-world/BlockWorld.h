@@ -30,7 +30,7 @@ namespace gdl {
         void render(Camera *camera) override;
         void update(const TimeManager& tm, GLFWwindow* window) override;
     private:
-        float scale = 1.0f;
+        float scale = 2.0f;
         void generate(float offsetX = 0, float offsetY = 0);
         BlockWorldSize size;
         std::vector<Chunk> chunks;
